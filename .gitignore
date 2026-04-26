@@ -130,14 +130,66 @@ dmypy.json
 *~
 .DS_Store
 
-# Sensitive configuration
+# Sensitive configuration & secrets
 .confluence.yaml
 .jira.yaml
+.confluence.local.yaml
+.jira.local.yaml
 confluence-token.txt
 jira-token.txt
 *.key
 *.pem
 *.pfx
+*.p12
+*.p8
+*.crt
+*.cert
+*.cer
+*.der
+secrets.yaml
+secrets.json
+secrets.txt
+.secrets
+.secrets.*
+
+# Environment & credentials
+.env*
+!.env.example
+.env.local
+.env.*.local
+credentials
+credentials.json
+config.local.yaml
+config.local.json
+private.yaml
+private.json
+
+# API tokens and credentials (generic patterns)
+*token*
+*secret*
+*credential*
+*password*
+*api_key*
+*apikey*
+oauth_token
+bearer_token
+access_token
+refresh_token
+
+# AWS/Cloud credentials
+.aws/
+.aws/credentials
+.aws/config
+aws-credentials.txt
+gcloud/
+gcloud-credentials.json
+azure-credentials.json
+kubeconfig
+
+# SSH & encryption
+ssh-key*
+.ssh/
+*.pub
 
 # Poetry
 poetry.lock
@@ -145,3 +197,10 @@ poetry.lock
 # Build artifacts
 *.tar.gz
 *.zip
+
+# Temporary files that might contain secrets
+*.swp~
+*.swo~
+tmp/
+temp/
+.tmp/
