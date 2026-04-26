@@ -264,7 +264,7 @@ class DocumentMetadata:
     def content_hash(self) -> str:
         """Generate hash of metadata for change detection."""
         content = f"{self.title}|{self.version}|{self.status}|{','.join(sorted(self.labels))}"
-        return hashlib.md5(content.encode()).hexdigest()
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
 
 
 @dataclass

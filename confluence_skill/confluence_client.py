@@ -485,7 +485,7 @@ class ConfluenceClient:
             MD5 hash of page content
         """
         content = self.get_page_content(page_id)
-        return hashlib.md5(content.encode()).hexdigest()
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
 
     def validate_space(self, space_key: str) -> bool:
         """Validate that space exists and is accessible.

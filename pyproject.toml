@@ -48,6 +48,7 @@ mypy = "^1.8.0"
 bandit = "^1.9.0"
 pip-audit = "^2.10.0"
 checkov = "^3.2.510"
+setuptools-scm = "^8.0.0"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

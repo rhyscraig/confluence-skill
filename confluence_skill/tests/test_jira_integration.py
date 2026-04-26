@@ -3,8 +3,8 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from skills.confluence.jira_integration import JiraClient, JiraIntegration
-from skills.confluence.models import JiraConfig
+from confluence_skill.jira_integration import JiraClient, JiraIntegration
+from confluence_skill.models import JiraConfig
 
 
 @pytest.fixture

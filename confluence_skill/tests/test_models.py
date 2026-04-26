@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime
 
-from skills.confluence.models import (
+from confluence_skill.models import (
     SkillConfig,
     ConfluenceConfig,
     DocumentMetadata,
@@ -128,7 +128,7 @@ def test_document_generation_result_success():
 
 def test_document_generation_result_with_errors():
     """Test generation result with validation errors."""
-    from skills.confluence.models import ValidationError
+    from confluence_skill.models import ValidationError
 
     result = DocumentGenerationResult(
         success=False,

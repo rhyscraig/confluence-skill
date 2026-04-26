@@ -42,7 +42,10 @@ from .models import (
 )
 from .skill import ConfluenceSkill
 
-__version__ = "1.2.0"
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "1.2.0"  # Fallback version
 
 __all__ = [
     # Main skill

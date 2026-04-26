@@ -3,21 +3,21 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from skills.confluence.skill import ConfluenceSkill
-from skills.confluence.models import SkillConfig, ConfluenceConfig, DocumentTemplate
+from confluence_skill.skill import ConfluenceSkill
+from confluence_skill.models import SkillConfig, ConfluenceConfig, DocumentTemplate
 
 
 @pytest.fixture
 def skill(skill_config):
     """Create skill instance for testing."""
     # Mock the ConfluenceClient to avoid real API calls
-    with patch('skills.confluence.skill.ConfluenceClient'):
+    with patch('confluence_skill.skill.ConfluenceClient'):
         return ConfluenceSkill(skill_config)
 
 
 def test_skill_initialization(skill_config):
     """Test skill initialization."""
-    with patch('skills.confluence.skill.ConfluenceClient'):
+    with patch('confluence_skill.skill.ConfluenceClient'):
         skill = ConfluenceSkill(skill_config)
     assert skill.config == skill_config
     assert skill.console is not None
@@ -137,7 +137,7 @@ def test_skill_create_page(skill):
 
 def test_skill_configuration_override(skill_config):
     """Test configuration overrides."""
-    with patch('skills.confluence.skill.ConfluenceClient'):
+    with patch('confluence_skill.skill.ConfluenceClient'):
         skill = ConfluenceSkill(skill_config)
 
         with patch.object(skill.scanner, 'scan_repos', return_value={}):

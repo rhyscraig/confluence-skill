@@ -2,14 +2,14 @@
 
 import pytest
 
-from skills.confluence.doc_generators import (
+from confluence_skill.doc_generators import (
     APIDocGenerator,
     ArchitectureDocGenerator,
     RunbookDocGenerator,
     ADRDocGenerator,
     create_generator,
 )
-from skills.confluence.models import DocumentMetadata, DocumentTemplate
+from confluence_skill.models import DocumentMetadata, DocumentTemplate
 
 
 @pytest.fixture

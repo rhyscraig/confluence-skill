@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from skills.confluence.models import (
+from confluence_skill.models import (
     SkillConfig,
     LocalConfig,
     DocumentationConfig,
@@ -16,7 +16,7 @@ from skills.confluence.models import (
 
 def test_local_config_from_yaml():
     """Test loading local config from YAML."""
-    from skills.confluence.models import DocumentTemplate
+    from confluence_skill.models import DocumentTemplate
 
     yaml_content = """
 documentation:
@@ -46,7 +46,7 @@ def test_local_config_missing_file():
 
 def test_config_merge_documentation(skill_config):
     """Test merging documentation config."""
-    from skills.confluence.models import DocumentTemplate
+    from confluence_skill.models import DocumentTemplate
 
     local_config = LocalConfig(
         documentation=DocumentationConfig(

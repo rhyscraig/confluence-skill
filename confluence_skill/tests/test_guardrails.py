@@ -2,8 +2,8 @@
 
 import pytest
 
-from skills.confluence.guardrails import GuardailValidator, ApprovalGate
-from skills.confluence.models import GuardrailsConfig, DocumentMetadata
+from confluence_skill.guardrails import GuardailValidator, ApprovalGate
+from confluence_skill.models import GuardrailsConfig, DocumentMetadata
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def test_validator_reset():
     validator = GuardailValidator(config)
 
     # Add some errors
-    from skills.confluence.models import ValidationError
+    from confluence_skill.models import ValidationError
     validator.errors = [ValidationError("error", "test", "Test error")]
     validator.warnings = [ValidationError("warning", "test", "Test warning")]
 
