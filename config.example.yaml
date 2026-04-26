@@ -1,0 +1,183 @@
+# Example Confluence Documentation Skill Configuration
+# Copy to confluence.config.yaml and customize for your environment
+
+confluence:
+  # Your Confluence Cloud instance URL (required)
+  instance_url: "https://company.atlassian.net"
+
+  # Default space key for new documents
+  space_key: "ENG"
+
+  # Environment variable containing Confluence API token
+  # Generate at: https://id.atlassian.com/manage-profile/security/api-tokens
+  auth_token_env: "CONFLUENCE_TOKEN"
+
+  # API timeout in seconds
+  api_timeout_seconds: 30
+
+  # Rate limiting to avoid Confluence API throttling
+  rate_limit_per_minute: 60
+
+documentation:
+  # Document template type: api, architecture, runbook, adr, feature, infrastructure, troubleshooting, custom
+  template: "api"
+
+  # Override default space (from confluence.space_key)
+  # space_key: "PLATFORM"
+
+  # Parent page under which to create this document
+  # Will search for page with this title in the space
+  parent_page: "API Documentation"
+
+  # Alternatively, use exact page ID (takes precedence over parent_page)
+  # parent_page_id: "123456"
+
+  # Auto-generate title from repo/service name
+  auto_title: true
+
+  # How to handle existing documents:
+  #   append: Add new content after existing content
+  #   replace: Replace entire document (with confirmation)
+  #   interactive: Ask user how to handle (DEFAULT)
+  #   skip: Don't update if document exists
+  merge_strategy: "interactive"
+
+  # Track version and last-updated metadata
+  version_tracking: true
+
+  # Default metadata for generated documents
+  metadata:
+    owner: "platform-team"
+    audience:
+      - "engineers"
+      - "oncall"
+    status: "draft"  # Will be changed to published after review
+    labels:
+      - "auto-generated"
+      - "api-docs"
+
+code_analysis:
+  # Enable code scanning and extraction
+  enabled: true
+
+  # Repositories to analyze
+  repos:
+    # Single repo with patterns
+    - path: "backend/payment-service"
+      branch: "main"
+      include_patterns:
+        - "*.py"
+        - "src/**/*.py"
+      exclude_patterns:
+        - "test_*.py"
+        - "**/__pycache__/**"
+
+    # Multiple repos can be specified
+    # - path: "backend/user-service"
+    #   include_patterns: ["*.go"]
+
+    # Global patterns if no repo-specific ones
+    # - path: "sdk/typescript"
+    #   include_patterns: ["src/**/*.ts"]
+
+  # What to extract from code
+  extract:
+    - apis        # Find API endpoints, REST routes
+    - architecture  # Class/module structure
+    - dependencies  # Import/dependency analysis
+    # - classes
+    # - functions
+    # - config
+    # - errors
+    # - examples
+
+  # Skip very large files
+  max_file_size_kb: 500
+
+  # Limit files analyzed to avoid huge documents
+  max_files_to_analyze: 100
+
+guardrails:
+  # Enable all safety checks
+  enabled: true
+
+  # Require user approval before writing to Confluence
+  # Set to false only in CI/CD with proper controls
+  require_approval: true
+
+  # Run in dry-run mode by default (preview, don't write)
+  dry_run_by_default: true
+
+  # Validate all links in the document
+  validate_links: true
+
+  # Check that you have permission to write to the space/page
+  check_permissions: true
+
+  # Validate metadata completeness
+  validate_metadata: true
+
+  # Warn if document exceeds this size
+  max_document_size_kb: 2000
+
+  # Fields that must be present in metadata
+  required_metadata_fields:
+    - "owner"
+    - "audience"
+
+  # Terms that trigger deprecation warnings
+  deprecated_terms:
+    - "legacy"
+    - "deprecated"
+    - "obsolete"
+
+# Integration with external systems
+integration:
+  github:
+    # GitHub organization (if linking code snippets)
+    org: "my-org"
+
+    # Environment variable for GitHub token
+    token_env: "GITHUB_TOKEN"
+
+    # Link code snippets to GitHub web URLs
+    link_to_repo: true
+
+# Jira integration configuration
+jira:
+  # Enable Jira integration
+  enabled: true
+
+  # Jira Cloud instance URL
+  instance_url: "https://company.atlassian.net"
+
+  # Environment variable containing Jira API token
+  # Generate at: https://id.atlassian.com/manage-profile/security/api-tokens
+  auth_token_env: "JIRA_TOKEN"
+
+  # Default project key (can be overridden per-repo)
+  default_project: "ENGR"
+
+  # Auto-link related Jira issues to documentation
+  auto_link_related: true
+
+  # Create Jira tasks for undocumented APIs
+  create_tasks_for_gaps: false
+
+  # Pattern to find epic links (e.g., "PROJ-\d+")
+  epic_link_pattern: null
+
+  # Custom field mappings (e.g., epic link field ID)
+  custom_fields:
+    # epic_link: "customfield_10014"
+
+# Output and logging
+output:
+  # Verbose logging
+  verbose: false
+
+  # Write operation logs to file
+  # log_file: "/tmp/confluence-skill.log"
+
+  # Add audit trail comments to pages showing what changed
+  create_audit_trail: true

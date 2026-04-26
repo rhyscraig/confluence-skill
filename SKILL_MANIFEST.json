@@ -1,0 +1,86 @@
+{
+  "name": "confluence",
+  "displayName": "Confluence Documentation Skill",
+  "version": "1.2.0",
+  "description": "Enterprise-grade documentation generation, management, and Jira integration for Confluence Cloud",
+  "author": "Craig Hoad",
+  "license": "MIT",
+  "repository": "https://github.com/rhyscraig/claude-skills",
+  "homepage": "https://github.com/rhyscraig/claude-skills/tree/master/skills/confluence",
+  "keywords": [
+    "confluence",
+    "documentation",
+    "jira",
+    "cloud",
+    "enterprise",
+    "api-docs",
+    "architecture",
+    "runbook"
+  ],
+  "capabilities": [
+    "document-generation",
+    "page-management",
+    "jira-integration",
+    "bulk-operations",
+    "configuration-merging",
+    "input-validation"
+  ],
+  "requiredEnvironment": [
+    "CONFLUENCE_TOKEN"
+  ],
+  "optionalEnvironment": [
+    "JIRA_TOKEN"
+  ],
+  "configuration": {
+    "type": "file",
+    "fileName": ".confluence.yaml",
+    "allowLocal": true,
+    "allowCentral": true
+  },
+  "entryPoints": {
+    "skill": "skills.confluence:ConfluenceSkill",
+    "mcp": "skills.confluence.mcp:serve"
+  },
+  "dependencies": {
+    "pydantic": "^2.5.0",
+    "pyyaml": "^6.0.0",
+    "rich": "^14.0.0",
+    "requests": "^2.31.0"
+  },
+  "capabilities_detailed": {
+    "document-generation": {
+      "description": "Generate documentation from code repositories",
+      "templates": ["api", "architecture", "runbook", "adr", "feature", "infrastructure", "troubleshooting", "custom"],
+      "capabilities": ["code-scanning", "metadata-generation", "content-validation"]
+    },
+    "page-management": {
+      "description": "Create, update, search, and archive Confluence pages",
+      "operations": ["create", "update", "search", "list-hierarchy", "archive", "bulk-label"]
+    },
+    "jira-integration": {
+      "description": "Link Jira issues and create tasks for documentation gaps",
+      "features": ["issue-linking", "task-creation", "project-binding"],
+      "optional": true
+    },
+    "input-validation": {
+      "description": "Comprehensive input validation at all API boundaries",
+      "validators": ["space-key", "page-title", "labels", "content-size", "html-sanitization"]
+    }
+  },
+  "performance": {
+    "rateLimiting": "60 requests/minute",
+    "caching": ["pages", "permissions"],
+    "timeout": "30 seconds per request"
+  },
+  "testing": {
+    "coverage": ">85%",
+    "tests": 71,
+    "categories": ["unit", "integration", "config", "jira"]
+  },
+  "quality": {
+    "typeHints": true,
+    "docstrings": true,
+    "errorHandling": "comprehensive",
+    "logging": "optional"
+  }
+}

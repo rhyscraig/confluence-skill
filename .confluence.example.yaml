@@ -1,0 +1,69 @@
+# Example local repository configuration
+# Copy to your repository root as .confluence.yaml to override central settings
+# Central configuration is merged first, local settings override
+
+documentation:
+  # Which space to document this service in
+  space_key: "SERVICES"
+
+  # Parent page under which to place documentation
+  parent_page: "Microservices"
+
+  # Document template type (api, architecture, runbook, adr, feature, infrastructure, troubleshooting)
+  template: "api"
+
+  # Auto-generate title from service name
+  auto_title: true
+
+  # How to handle if document already exists (append, replace, skip, interactive)
+  merge_strategy: "interactive"
+
+  # Metadata for this service's documentation
+  metadata:
+    # Team that owns this service
+    owner: "payments-team"
+
+    # Who should read this documentation
+    audience:
+      - "backend-engineers"
+      - "platform-team"
+
+    # Labels to apply to the page
+    labels:
+      - "microservice"
+      - "payments"
+
+# Code analysis overrides for this repository
+code_analysis:
+  # Which files to include when scanning this repo
+  include_patterns:
+    - "src/**/*.py"
+    - "api/**/*.py"
+
+  # Which files to exclude
+  exclude_patterns:
+    - "test_*.py"
+    - "**/tests/**"
+
+  # What to extract (apis, architecture, dependencies, classes, functions, config, errors, examples)
+  extract:
+    - apis
+    - architecture
+    - dependencies
+
+# Jira integration for this service
+jira:
+  # Enable Jira integration
+  enabled: true
+
+  # Jira project for this service
+  default_project: "PAYMENTS"
+
+  # Pattern to find epic issues for this service
+  epic_link_pattern: "PAYMENTS-\d+"
+
+  # Auto-link related Jira issues to documentation
+  auto_link_related: true
+
+  # Create Jira tasks for undocumented APIs
+  create_tasks_for_gaps: true

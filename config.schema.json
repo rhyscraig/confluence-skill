@@ -1,0 +1,273 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Confluence Documentation Skill Configuration",
+  "type": "object",
+  "required": ["confluence"],
+  "additionalProperties": false,
+  "properties": {
+    "confluence": {
+      "type": "object",
+      "required": ["instance_url"],
+      "properties": {
+        "instance_url": {
+          "type": "string",
+          "pattern": "^https://.*\\.atlassian\\.net/?$",
+          "description": "Confluence Cloud instance URL"
+        },
+        "space_key": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]+$",
+          "description": "Default space key for new documents"
+        },
+        "auth_token_env": {
+          "type": "string",
+          "default": "CONFLUENCE_TOKEN",
+          "description": "Environment variable containing API token"
+        },
+        "api_timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 60,
+          "default": 30
+        },
+        "rate_limit_per_minute": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 300,
+          "default": 60
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "enum": ["api", "architecture", "runbook", "adr", "feature", "infrastructure", "troubleshooting", "custom"],
+          "default": "custom",
+          "description": "Document template type"
+        },
+        "space_key": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]+$",
+          "description": "Space key override for this documentation"
+        },
+        "parent_page": {
+          "type": "string",
+          "description": "Parent page title (will be found in space)"
+        },
+        "parent_page_id": {
+          "type": "string",
+          "description": "Parent page ID (exact match, takes precedence)"
+        },
+        "auto_title": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-generate title from repo/service name if not provided"
+        },
+        "merge_strategy": {
+          "type": "string",
+          "enum": ["append", "replace", "interactive", "skip"],
+          "default": "interactive",
+          "description": "How to handle existing documents"
+        },
+        "version_tracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Add version and last-updated metadata"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "owner": {
+              "type": "string",
+              "description": "Default owner/author"
+            },
+            "audience": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Target audience (e.g., engineers, oncall, product)"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["draft", "review", "published", "archived"],
+              "default": "draft"
+            },
+            "labels": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Confluence labels to apply"
+            }
+          }
+        }
+      }
+    },
+    "code_analysis": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "repos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Repository path (relative to /Users/craighoad/Repos or absolute)"
+              },
+              "branch": {
+                "type": "string",
+                "default": "main",
+                "description": "Git branch to analyze"
+              },
+              "include_patterns": {
+                "type": "array",
+                "items": {"type": "string"},
+                "example": ["*.py", "src/**/*.ts", "api/**"],
+                "description": "File patterns to include"
+              },
+              "exclude_patterns": {
+                "type": "array",
+                "items": {"type": "string"},
+                "example": ["test_*.py", "**/*.test.ts", "node_modules/**"]
+              }
+            }
+          }
+        },
+        "extract": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["apis", "architecture", "dependencies", "classes", "functions", "config", "errors", "examples"]
+          },
+          "default": ["apis", "architecture", "dependencies"],
+          "description": "What to extract from code"
+        },
+        "max_file_size_kb": {
+          "type": "integer",
+          "default": 500,
+          "description": "Skip files larger than this"
+        },
+        "max_files_to_analyze": {
+          "type": "integer",
+          "default": 100,
+          "description": "Limit number of files analyzed"
+        }
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "require_approval": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require user approval before writing to Confluence"
+        },
+        "dry_run_by_default": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run in dry-run mode unless explicitly disabled"
+        },
+        "validate_links": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate all internal and external links"
+        },
+        "check_permissions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check write permissions before operating"
+        },
+        "validate_metadata": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ensure required metadata is present"
+        },
+        "max_document_size_kb": {
+          "type": "integer",
+          "default": 2000,
+          "description": "Warn if document exceeds this size"
+        },
+        "required_metadata_fields": {
+          "type": "array",
+          "items": {"type": "string"},
+          "example": ["owner", "audience"],
+          "description": "Fields that must be present in metadata"
+        },
+        "deprecated_terms": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Terms that trigger deprecation warnings"
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "properties": {
+        "github": {
+          "type": "object",
+          "properties": {
+            "org": {
+              "type": "string",
+              "description": "GitHub organization name"
+            },
+            "token_env": {
+              "type": "string",
+              "default": "GITHUB_TOKEN",
+              "description": "Environment variable for GitHub token"
+            },
+            "link_to_repo": {
+              "type": "boolean",
+              "default": true,
+              "description": "Link code snippets to GitHub"
+            }
+          }
+        },
+        "jira": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "url": {
+              "type": "string",
+              "description": "Jira instance URL"
+            },
+            "link_related_issues": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Verbose logging output"
+        },
+        "log_file": {
+          "type": "string",
+          "description": "Path to write operation logs"
+        },
+        "create_audit_trail": {
+          "type": "boolean",
+          "default": true,
+          "description": "Create audit trail comments on Confluence pages"
+        }
+      }
+    }
+  }
+}
