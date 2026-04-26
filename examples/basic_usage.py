@@ -6,8 +6,8 @@ This example shows:
 3. Generating documentation in dry-run mode
 """
 
-from skills.confluence import ConfluenceSkill
-from skills.confluence.models import SkillConfig
+from confluence_skill import ConfluenceSkill
+from confluence_skill.models import SkillConfig
 
 
 def main():

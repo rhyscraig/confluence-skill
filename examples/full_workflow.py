@@ -8,8 +8,8 @@ This example demonstrates:
 """
 
 from pathlib import Path
-from skills.confluence import ConfluenceSkill
-from skills.confluence.models import SkillConfig, LocalConfig
+from confluence_skill import ConfluenceSkill
+from confluence_skill.models import SkillConfig, LocalConfig
 
 
 def main():

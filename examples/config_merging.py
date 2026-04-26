@@ -6,7 +6,7 @@ This shows how the Confluence skill handles:
 3. Configuration validation
 """
 
-from skills.confluence.models import (
+from confluence_skill.models import (
     SkillConfig,
     LocalConfig,
     DocumentationConfig,
