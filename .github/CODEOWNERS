@@ -1,0 +1,13 @@
+# Global owner
+* @craighoad
+
+# Skill development
+cloudctl-skill/ @craighoad
+confluence-skill/ @craighoad
+cloudctl-skill/ @craighoad
+
+# Infrastructure (all)
+**/*terraform* @craighoad
+**/*gcp* @craighoad
+**/*aws* @craighoad
+**/*azure* @craighoad
