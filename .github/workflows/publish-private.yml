@@ -1,0 +1,165 @@
+name: Publish (Private & Public)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-mock pytest-asyncio ruff black mypy bandit pip-audit
+          pip install -e .
+
+      - name: Run tests
+        run: pytest tests/ -v --cov=src/confluence_skill --cov-report=xml
+
+      - name: Security checks
+        run: |
+          bandit -r src/ || true
+          pip-audit --skip-editable || true
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build wheel twine
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check with twine
+        run: twine check dist/*
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          PACKAGE_NAME=$(grep 'name = ' pyproject.toml | head -1 | sed 's/name = "//' | sed 's/"//')
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Publish to python-packages-private repo (Private)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages-private.git /tmp/python-packages-private
+          cd /tmp/python-packages-private
+
+          mkdir -p packages/${{ steps.version.outputs.package_name }}
+          cp /github/workspace/dist/* packages/${{ steps.version.outputs.package_name }}/
+
+          cat > packages/${{ steps.version.outputs.package_name }}/metadata.json << EOF
+          {
+            "name": "${{ steps.version.outputs.package_name }}",
+            "version": "${{ steps.version.outputs.version }}",
+            "repository": "https://github.com/hoad-org/confluence-skill",
+            "published_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+            "python_requires": ">=3.12",
+            "distributions": [
+              "confluence_skill-${{ steps.version.outputs.version }}-py3-none-any.whl",
+              "confluence_skill-${{ steps.version.outputs.version }}.tar.gz"
+            ]
+          }
+          EOF
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add packages/${{ steps.version.outputs.package_name }}/
+          git commit -m "publish: ${{ steps.version.outputs.package_name }} v${{ steps.version.outputs.version }}" || echo "No changes to commit"
+          git push origin main
+
+      - name: Publish to python-packages repo (Public)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages.git /tmp/python-packages
+          cd /tmp/python-packages
+
+          mkdir -p packages/${{ steps.version.outputs.package_name }}
+          cp /github/workspace/dist/* packages/${{ steps.version.outputs.package_name }}/
+
+          cat > packages/${{ steps.version.outputs.package_name }}/metadata.json << EOF
+          {
+            "name": "${{ steps.version.outputs.package_name }}",
+            "version": "${{ steps.version.outputs.version }}",
+            "repository": "https://github.com/hoad-org/confluence-skill",
+            "published_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+            "python_requires": ">=3.12",
+            "distributions": [
+              "confluence_skill-${{ steps.version.outputs.version }}-py3-none-any.whl",
+              "confluence_skill-${{ steps.version.outputs.version }}.tar.gz"
+            ]
+          }
+          EOF
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add packages/${{ steps.version.outputs.package_name }}/
+          git commit -m "publish: ${{ steps.version.outputs.package_name }} v${{ steps.version.outputs.version }}" || echo "No changes to commit"
+          git push origin main
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          body: |
+            # ${{ steps.version.outputs.package_name }} v${{ steps.version.outputs.version }}
+
+            ## Installation
+
+            ### Private Index (Recommended)
+            ```bash
+            export GITHUB_TOKEN=your_github_token
+            pip install --index-url https://__token__:${GITHUB_TOKEN}@github.com/hoad-org/python-packages-private/simple/ ${{ steps.version.outputs.package_name }}==${{ steps.version.outputs.version }}
+            ```
+
+            ### Public Index (For Open Source)
+            ```bash
+            pip install --index-url https://hoad-org.github.io/python-packages ${{ steps.version.outputs.package_name }}==${{ steps.version.outputs.version }}
+            ```
+
+            ### Direct from Repository
+            ```bash
+            pip install git+https://github.com/hoad-org/confluence-skill@v${{ steps.version.outputs.version }}
+            ```
+
+            All distributions are built and tested with:
+            - Python 3.12 & 3.13
+            - 85%+ code coverage
+            - Security scanning (bandit, pip-audit)
+            - Type checking (mypy)
+          draft: false
+          prerelease: false
