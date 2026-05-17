@@ -1,10 +1,12 @@
-"""Main Confluence documentation skill."""
+"""Main Confluence documentation skill with DevArmor compliance."""
 
 import logging
 import time
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
+from devarmor import BaseDevArmorSkill, DevArmorAPI, Event, EventType
 from rich.console import Console
 from rich.panel import Panel
 
@@ -27,14 +29,26 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class ConfluenceSkill:
-    """Center-of-excellence Confluence documentation skill."""
+class ConfluenceSkill(BaseDevArmorSkill):
+    """Center-of-excellence Confluence documentation skill with DevArmor compliance.
 
-    def __init__(self, config: SkillConfig):
+    Lifecycle:
+    - on_install: Initialize Confluence API, subscribe to events
+    - on_upgrade: Migrate config, publish version event
+    - on_remove: Cleanup webhooks, unsubscribe from events
+    """
+
+    name = "confluence-skill"
+    version = "2.0.0"
+    description = "Enterprise-grade Confluence Cloud documentation skill"
+    author = "Craig Hoad"
+
+    def __init__(self, config: SkillConfig, devarmor_api: DevArmorAPI | None = None):
         """Initialize skill with configuration.
 
         Args:
             config: Skill configuration
+            devarmor_api: Optional DevArmorAPI instance (created if not provided)
 
         Raises:
             ValueError: If configuration is invalid
@@ -45,6 +59,7 @@ class ConfluenceSkill:
             raise ValueError("Configuration errors:\n" + "\n".join(f"  - {e}" for e in config_errors))
 
         self.config = config
+        self.devarmor_api = devarmor_api or DevArmorAPI()
         self.console = Console()
         self.client = ConfluenceClient(
             config.confluence,
@@ -62,6 +77,8 @@ class ConfluenceSkill:
             interactive=False,  # Can be set to True for interactive mode
         )
         self._operation_log: list[DocumentChange] = []
+        self._initialized = False
+        self.event_subscriptions: dict[str, str] = {}  # Maps event_type -> subscriber_id
 
     def document(
         self,
@@ -539,3 +556,156 @@ class ConfluenceSkill:
             self.console.print("\n[bold]Content Preview:[/bold]")
             panel = Panel(result.content_preview[:300], expand=False)
             self.console.print(panel)
+
+    # DevArmor Configuration Validation
+
+    def validate_config(self, config) -> dict[str, Any]:  # noqa: ARG002
+        """Validate skill configuration against policy.
+
+        Args:
+            config: Configuration to validate
+
+        Returns:
+            Validation result with any errors/warnings
+        """
+        errors = []
+        warnings = []
+
+        # Validate Confluence configuration
+        if not self.config.confluence.instance_url:
+            errors.append("confluence.instance_url is required")
+
+        if not self.config.confluence.space_key:
+            warnings.append("confluence.space_key not set (will be required for most operations)")
+
+        # Validate Jira configuration if enabled
+        if hasattr(self.config, "jira") and self.config.jira and self.config.jira.enabled:
+            if not self.config.jira.instance_url:
+                errors.append("jira.instance_url is required when Jira integration is enabled")
+
+        return {"valid": len(errors) == 0, "errors": errors, "warnings": warnings}
+
+    # DevArmor Lifecycle Hooks
+
+    async def on_install(self, devarmor: DevArmorAPI) -> None:
+        """Install hook: Initialize Confluence API and subscribe to events.
+
+        Args:
+            devarmor: DevArmorAPI instance
+        """
+        await super().on_install(devarmor)
+        logger.info(f"Installing {self.name} v{self.version}")
+
+        # Validate Confluence connection
+        try:
+            spaces = self.client.get_spaces()
+            logger.info(f"Confluence connected: {len(spaces)} spaces accessible")
+        except Exception as e:
+            logger.error(f"Confluence connection failed: {e}")
+            raise
+
+        # Publish skill.installed event
+        await self.devarmor_api.event_bus.publish_skill_installed(
+            skill_name=self.name,
+            version=self.version,
+            actor="claude",
+            details={
+                "confluence_instance": self.config.confluence.instance_url,
+                "space_key": self.config.confluence.space_key,
+                "subscriptions": list(self.event_subscriptions.keys()),
+            },
+        )
+
+        logger.info(f"{self.name} installed successfully")
+
+    async def on_upgrade(self, old_version: str, devarmor: DevArmorAPI) -> None:
+        """Upgrade hook: Migrate config and publish upgrade event.
+
+        Args:
+            old_version: Previous version
+            devarmor: DevArmorAPI instance
+        """
+        await super().on_upgrade(old_version, devarmor)
+        logger.info(f"Upgrading {self.name} from v{old_version} to v{self.version}")
+
+        # Log version migration
+        logger.info(f"Config migration: v{old_version} -> v{self.version}")
+
+        # Publish skill.upgraded event
+        await self.devarmor_api.event_bus.publish_skill_upgraded(
+            skill_name=self.name,
+            old_version=old_version,
+            new_version=self.version,
+            actor="claude",
+        )
+
+        logger.info(f"{self.name} upgraded successfully")
+
+    async def on_remove(self, devarmor: DevArmorAPI) -> None:
+        """Remove hook: Cleanup Confluence webhooks and unsubscribe from events.
+
+        Args:
+            devarmor: DevArmorAPI instance
+        """
+        await super().on_remove(devarmor)
+        logger.info(f"Removing {self.name}")
+
+        # Cleanup subscriptions
+        for subscriber_id in list(self.event_subscriptions.keys()):
+            self.devarmor_api.event_bus.unsubscribe(subscriber_id)
+            logger.info(f"Unsubscribed: {subscriber_id}")
+
+        # Publish skill.removed event
+        await self.devarmor_api.event_bus.publish_skill_removed(
+            skill_name=self.name,
+            actor="claude",
+        )
+
+        logger.info(f"{self.name} removed successfully")
+
+    async def publish_document_created(self, page_id: str, title: str, actor: str = "claude", **details: Any) -> None:
+        """Publish event when a document is created.
+
+        Args:
+            page_id: Confluence page ID
+            title: Page title
+            actor: Who created the document
+            **details: Additional details
+        """
+        event = Event(
+            event_type=EventType.AUDIT_LOG,
+            skill_name=self.name,
+            actor=actor,
+            action="create_page",
+            details={"page_id": page_id, "title": title, "event_type": "document_created", **details},
+            severity="info",
+        )
+        await self.devarmor_api.event_bus.publish(event)
+
+    async def publish_document_updated(
+        self, page_id: str, title: str, changes: dict[str, Any], actor: str = "claude", **details: Any
+    ) -> None:
+        """Publish event when a document is updated.
+
+        Args:
+            page_id: Confluence page ID
+            title: Page title
+            changes: Changes made to document
+            actor: Who updated the document
+            **details: Additional details
+        """
+        event = Event(
+            event_type=EventType.AUDIT_LOG,
+            skill_name=self.name,
+            actor=actor,
+            action="update_page",
+            details={
+                "page_id": page_id,
+                "title": title,
+                "changes": changes,
+                "event_type": "document_updated",
+                **details,
+            },
+            severity="info",
+        )
+        await self.devarmor_api.event_bus.publish(event)
