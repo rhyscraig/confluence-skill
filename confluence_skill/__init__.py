@@ -46,7 +46,7 @@ from .skill import ConfluenceSkill
 try:
     from ._version import __version__
 except ImportError:
-    __version__ = "1.3.0"  # Fallback version
+    __version__ = "1.3.1"  # Fallback version
 
 __all__ = [
     "ConfluenceClient",

@@ -24,6 +24,8 @@ def mock_config():
 
 def test_cli_version(capsys):
     """Test version command."""
+    import confluence_skill
+
     with patch.object(sys, "argv", ["confluence", "--version"]):
         try:
             main()
@@ -31,7 +33,7 @@ def test_cli_version(capsys):
             pass
 
     captured = capsys.readouterr()
-    assert "1.2.0" in captured.out or "1.2.0" in captured.err
+    assert confluence_skill.__version__ in captured.out or confluence_skill.__version__ in captured.err
 
 
 def test_cli_help(capsys):
