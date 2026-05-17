@@ -159,9 +159,7 @@ class TestConfluenceSearchTool:
     def test_confluence_search_max_results(self, mock_skill):
         """Test search respects max_results limit."""
         mock_instance = MagicMock()
-        mock_instance.search_pages.return_value = [
-            {"title": f"Page {i}", "id": str(i)} for i in range(20)
-        ]
+        mock_instance.search_pages.return_value = [{"title": f"Page {i}", "id": str(i)} for i in range(20)]
         mock_skill.return_value = mock_instance
 
         with patch("confluence_skill.mcp.get_default_config") as mock_get_config:

@@ -94,9 +94,7 @@ class PageHierarchyValidator:
                 path = set()
 
             if page_title in path:
-                raise ValueError(
-                    f"Circular parent-child relationship detected with page '{page_title}'"
-                )
+                raise ValueError(f"Circular parent-child relationship detected with page '{page_title}'")
 
             depth = 1
             parent_title = pages_by_title.get(page_title, {}).get("parent_page_title")
@@ -112,9 +110,7 @@ class PageHierarchyValidator:
                 return
 
             if page_title in in_progress:
-                raise ValueError(
-                    f"Circular parent-child relationship detected with page '{page_title}'"
-                )
+                raise ValueError(f"Circular parent-child relationship detected with page '{page_title}'")
 
             in_progress.add(page_title)
             page = pages_by_title.get(page_title)

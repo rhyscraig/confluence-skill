@@ -51,16 +51,14 @@ class ConfluenceClient:
 
         # Initialize page hierarchy validator (opt-in, default is False for backwards compatibility)
         hierarchy_config = PageHierarchyConfig(
-            enforce_nesting=guardrails_config.get("enforce_page_nesting", False)
-            if guardrails_config
-            else False,
+            enforce_nesting=guardrails_config.get("enforce_page_nesting", False) if guardrails_config else False,
             max_depth=guardrails_config.get("max_page_depth", 3) if guardrails_config else 3,
-            parent_page_only_for_roots=guardrails_config.get("parent_page_only_for_roots", True)
-            if guardrails_config
-            else True,
-            aws_documentation_style=guardrails_config.get("aws_documentation_style", True)
-            if guardrails_config
-            else True,
+            parent_page_only_for_roots=(
+                guardrails_config.get("parent_page_only_for_roots", True) if guardrails_config else True
+            ),
+            aws_documentation_style=(
+                guardrails_config.get("aws_documentation_style", True) if guardrails_config else True
+            ),
         )
         self.hierarchy_validator = PageHierarchyValidator(hierarchy_config)
 

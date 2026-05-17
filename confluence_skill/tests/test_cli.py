@@ -55,10 +55,7 @@ def test_cli_document_dry_run(mock_skill, mock_config):
     mock_skill.return_value = mock_instance
     mock_config.from_yaml.return_value = MagicMock()
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "document", "Test task", "--doc-type", "api", "--dry-run"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "document", "Test task", "--doc-type", "api", "--dry-run"]):
         try:
             main()
         except SystemExit:
@@ -78,10 +75,7 @@ def test_cli_document_publish_requires_approval(mock_skill, mock_config, monkeyp
     inputs = iter(["n"])  # User refuses
     monkeypatch.setattr("builtins.input", lambda _: next(inputs, ""))
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "document", "Test task", "--doc-type", "api", "--publish"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "document", "Test task", "--doc-type", "api", "--publish"]):
         try:
             main()
         except (SystemExit, StopIteration):
@@ -91,16 +85,11 @@ def test_cli_document_publish_requires_approval(mock_skill, mock_config, monkeyp
 def test_cli_search(mock_skill, mock_config):
     """Test search command."""
     mock_instance = MagicMock()
-    mock_instance.search_pages.return_value = [
-        {"id": "123", "title": "Test Page"}
-    ]
+    mock_instance.search_pages.return_value = [{"id": "123", "title": "Test Page"}]
     mock_skill.return_value = mock_instance
     mock_config.from_yaml.return_value = MagicMock()
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "search", "payment API"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "search", "payment API"]):
         try:
             main()
         except SystemExit:
@@ -116,10 +105,7 @@ def test_cli_archive(mock_skill, mock_config):
     mock_skill.return_value = mock_instance
     mock_config.from_yaml.return_value = MagicMock()
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "archive", "123456", "--reason", "Obsolete"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "archive", "123456", "--reason", "Obsolete"]):
         try:
             main()
         except SystemExit:
@@ -132,10 +118,7 @@ def test_cli_error_handling(mock_skill, mock_config):
     """Test error handling in CLI."""
     mock_skill.side_effect = Exception("Connection error")
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "document", "Test", "--doc-type", "api"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "document", "Test", "--doc-type", "api"]):
         try:
             main()
         except SystemExit:
@@ -174,10 +157,7 @@ def test_cli_config_from_env(mock_skill):
         mock_config = MagicMock()
 
         with patch("confluence_skill.cli.SkillConfig.from_env", return_value=mock_config):
-            with patch.object(
-                sys, "argv",
-                ["confluence", "document", "Test", "--doc-type", "api", "--dry-run"]
-            ):
+            with patch.object(sys, "argv", ["confluence", "document", "Test", "--doc-type", "api", "--dry-run"]):
                 try:
                     main()
                 except SystemExit:
@@ -196,10 +176,7 @@ def test_cli_document_all_templates(mock_skill, mock_config):
         mock_skill.return_value = mock_instance
         mock_config.from_yaml.return_value = MagicMock()
 
-        with patch.object(
-            sys, "argv",
-            ["confluence", "document", "Test", "--doc-type", template, "--dry-run"]
-        ):
+        with patch.object(sys, "argv", ["confluence", "document", "Test", "--doc-type", template, "--dry-run"]):
             try:
                 main()
             except SystemExit:
@@ -215,10 +192,7 @@ def test_cli_search_with_space_key(mock_skill, mock_config):
     mock_skill.return_value = mock_instance
     mock_config.from_yaml.return_value = MagicMock()
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "search", "test", "--space-key", "ENGINEERING"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "search", "test", "--space-key", "ENGINEERING"]):
         try:
             main()
         except SystemExit:
@@ -236,10 +210,7 @@ def test_cli_archive_with_default_reason(mock_skill, mock_config):
     mock_skill.return_value = mock_instance
     mock_config.from_yaml.return_value = MagicMock()
 
-    with patch.object(
-        sys, "argv",
-        ["confluence", "archive", "123456"]
-    ):
+    with patch.object(sys, "argv", ["confluence", "archive", "123456"]):
         try:
             main()
         except SystemExit:
@@ -256,8 +227,9 @@ def test_cli_document_with_repo_path(mock_skill, mock_config):
     mock_config.from_yaml.return_value = MagicMock()
 
     with patch.object(
-        sys, "argv",
-        ["confluence", "document", "Test", "--doc-type", "api", "--repo-path", "/path/to/repo", "--dry-run"]
+        sys,
+        "argv",
+        ["confluence", "document", "Test", "--doc-type", "api", "--repo-path", "/path/to/repo", "--dry-run"],
     ):
         try:
             main()

@@ -305,9 +305,7 @@ class TestResultSummaries:
         """Test failure result summary."""
         result = DocumentGenerationResult(
             success=False,
-            errors=[
-                ValidationError(level="error", field="space", message="Space not found")
-            ],
+            errors=[ValidationError(level="error", field="space", message="Space not found")],
             duration_seconds=0.5,
         )
 
@@ -320,9 +318,7 @@ class TestResultSummaries:
         """Test has_errors detection."""
         result = DocumentGenerationResult(
             success=False,
-            errors=[
-                ValidationError(level="error", field="test", message="Test error")
-            ],
+            errors=[ValidationError(level="error", field="test", message="Test error")],
         )
 
         assert result.has_errors()
@@ -331,9 +327,7 @@ class TestResultSummaries:
         """Test when there are no errors."""
         result = DocumentGenerationResult(
             success=True,
-            warnings=[
-                ValidationError(level="warning", field="test", message="Test warning")
-            ],
+            warnings=[ValidationError(level="warning", field="test", message="Test warning")],
         )
 
         assert not result.has_errors()

@@ -199,9 +199,7 @@ class TestPageHierarchyValidator:
             "children": [
                 {
                     "title": "Child1",
-                    "children": [
-                        {"title": "Grandchild1", "children": []}
-                    ],
+                    "children": [{"title": "Grandchild1", "children": []}],
                 },
                 {"title": "Child2", "children": []},
             ],
@@ -226,9 +224,7 @@ class TestPageHierarchyValidator:
                             "children": [
                                 {
                                     "title": "L3",
-                                    "children": [
-                                        {"title": "L4", "children": []}
-                                    ],
+                                    "children": [{"title": "L4", "children": []}],
                                 }
                             ],
                         }
@@ -250,9 +246,7 @@ class TestPageHierarchyValidator:
             "children": [
                 {
                     "title": "Child1",
-                    "children": [
-                        {"title": "Grandchild1", "children": []}
-                    ],
+                    "children": [{"title": "Grandchild1", "children": []}],
                 },
                 {"title": "Child2", "children": []},
             ],
@@ -279,9 +273,7 @@ class TestPageHierarchyValidator:
                             "children": [
                                 {
                                     "title": "L3",
-                                    "children": [
-                                        {"title": "L4", "children": []}
-                                    ],
+                                    "children": [{"title": "L4", "children": []}],
                                 }
                             ],
                         }

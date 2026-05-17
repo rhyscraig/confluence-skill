@@ -486,9 +486,7 @@ class TestListChildPages:
     def test_list_child_pages_list_response(self, client):
         """Test child page listing when response is a list."""
         with patch.object(client, "_request") as mock_request:
-            mock_request.return_value = [
-                {"id": "child-1", "title": "Child 1"}
-            ]
+            mock_request.return_value = [{"id": "child-1", "title": "Child 1"}]
 
             result = client.list_child_pages("parent-123")
 

@@ -140,11 +140,7 @@ class TestJiraClientMethods:
         """Test finding epic for service."""
         with patch.object(jira_client.session, "get") as mock_get:
             mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "issues": [
-                    {"key": "INFRA-100", "summary": "Payment Service Epic"}
-                ]
-            }
+            mock_response.json.return_value = {"issues": [{"key": "INFRA-100", "summary": "Payment Service Epic"}]}
             mock_get.return_value = mock_response
 
             result = jira_client.find_epic_for_service("INFRA", "Payment Service")
@@ -260,9 +256,7 @@ class TestJiraIntegration:
 
         with patch.object(integration.client, "find_related_issues") as mock_find:
             with patch.object(integration.client, "session") as mock_session:
-                mock_find.return_value = [
-                    {"key": "INFRA-1", "summary": "Related issue"}
-                ]
+                mock_find.return_value = [{"key": "INFRA-1", "summary": "Related issue"}]
                 mock_session.post.return_value = MagicMock()
 
                 result = integration.link_related_issues(
@@ -344,9 +338,7 @@ class TestJiraIntegration:
         integration = JiraIntegration(jira_config)
 
         with patch.object(integration.client, "find_related_issues") as mock_find:
-            mock_find.return_value = [
-                {"key": "INFRA-1", "summary": "Related", "url": "https://test/INFRA-1"}
-            ]
+            mock_find.return_value = [{"key": "INFRA-1", "summary": "Related", "url": "https://test/INFRA-1"}]
 
             result = integration.generate_jira_section("INFRA", "Payment Service")
 

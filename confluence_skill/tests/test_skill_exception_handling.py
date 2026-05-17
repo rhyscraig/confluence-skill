@@ -140,9 +140,7 @@ class TestPrintResultSummary:
                     with patch("confluence_skill.skill.ApprovalGate"):
                         result = DocumentGenerationResult(
                             success=False,
-                            errors=[
-                                ValidationError(level="error", field="space", message="Space not found")
-                            ],
+                            errors=[ValidationError(level="error", field="space", message="Space not found")],
                             duration_seconds=0.5,
                         )
 

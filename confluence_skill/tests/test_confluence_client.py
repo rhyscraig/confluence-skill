@@ -68,9 +68,7 @@ class TestConfluenceClientSearch:
     def test_find_page_by_title_found(self, client):
         """Test finding page by title when it exists."""
         with patch.object(client, "_request") as mock_request:
-            mock_request.return_value = {
-                "results": [{"id": "789", "title": "Payment API"}]
-            }
+            mock_request.return_value = {"results": [{"id": "789", "title": "Payment API"}]}
 
             result = client.find_page_by_title("TEST", "Payment API")
 
@@ -90,9 +88,7 @@ class TestConfluenceClientSearch:
     def test_find_page_by_title_uses_cache(self, client):
         """Test that find_page_by_title uses cache."""
         with patch.object(client, "_request") as mock_request:
-            mock_request.return_value = {
-                "results": [{"id": "789", "title": "Payment API"}]
-            }
+            mock_request.return_value = {"results": [{"id": "789", "title": "Payment API"}]}
 
             # First call
             client.find_page_by_title("TEST", "Payment API")
@@ -241,9 +237,7 @@ class TestConfluenceClientPageOperations:
     def test_get_page_content(self, client):
         """Test extracting page content."""
         with patch.object(client, "get_page") as mock_get_page:
-            mock_get_page.return_value = {
-                "body": {"storage": {"value": "<p>Page content</p>"}}
-            }
+            mock_get_page.return_value = {"body": {"storage": {"value": "<p>Page content</p>"}}}
 
             result = client.get_page_content("page-1")
 
